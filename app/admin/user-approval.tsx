@@ -34,7 +34,7 @@ interface PendingUser {
   email: string;
   name: string;
   location: string;
-  verificationStatus: string;
+  status: string;
   selfieUrl: string;
   createdAt: any;
 }
@@ -59,7 +59,7 @@ export default function UserApproval() {
     
     const pendingQuery = query(
       collection(db, 'users'),
-      where('verificationStatus', '==', 'pending_verification')
+      where('status', '==', 'pending_verification')
     );
 
     const unsubscribe = onSnapshot(
@@ -73,11 +73,11 @@ export default function UserApproval() {
             ...doc.data()
           } as PendingUser;
           
-          console.log('📋 Pending user:', userData.email, 'Status:', userData.verificationStatus);
+          console.log('📋 Pending user:', userData.email, 'Status:', userData.status);
           return userData;
         });
         
-        console.log('📋 Updated pending users list:', users.map(u => `${u.email} (${u.verificationStatus})`));
+        console.log('📋 Updated pending users list:', users.map(u => `${u.email} (${u.status})`));
         
         setPendingUsers(users.sort((a, b) => 
           (b.createdAt?.toDate() || new Date()).getTime() - 
@@ -130,7 +130,7 @@ export default function UserApproval() {
       }
       
       const updateData = {
-        verificationStatus: 'approved_username_assigned',
+        status: 'approved_username_assigned',
         username: generateUsername(),
         approvedAt: serverTimestamp()
       };
@@ -139,7 +139,7 @@ export default function UserApproval() {
       await updateDoc(docRef, updateData);
       
       console.log('✅ APPROVE SUCCESS! User should disappear from list now');
-      console.log('✅ Updated status to:', updateData.verificationStatus);
+      console.log('✅ Updated status to:', updateData.status);
       Alert.alert('Success', 'User approved successfully!');
       
     } catch (error: any) {
@@ -196,7 +196,7 @@ export default function UserApproval() {
       }
       
       const updateData = {
-        verificationStatus: 'rejected',
+        status: 'rejected',
         rejectionReason: 'Manual review rejection',
         rejectedAt: serverTimestamp()
       };
@@ -205,7 +205,7 @@ export default function UserApproval() {
       await updateDoc(docRef, updateData);
       
       console.log('✅ REJECT SUCCESS! User should disappear from list now');
-      console.log('✅ Updated status to:', updateData.verificationStatus);
+      console.log('✅ Updated status to:', updateData.status);
       Alert.alert('Success', 'User rejected successfully!');
       
     } catch (error: any) {
